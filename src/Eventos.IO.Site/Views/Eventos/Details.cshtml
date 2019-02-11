@@ -1,0 +1,88 @@
+﻿@model Eventos.IO.Application.ViewModels.EventoViewModel
+
+@{
+    ViewData["Title"] = "Detalhes do Evento";
+}
+
+<div class="jumbotron">
+    <h1 class="display-4">@Model.Nome</h1>
+    <p class="lead">@Model.DescricaoCurta</p>
+    <hr class="my-4">
+    <p>Organizado por: @Html.DisplayFor(modelItem => Model.NomeEmpresa)</p>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Nome)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Nome)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DescricaoCurta)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.DescricaoCurta)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DescricaoLonga)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.DescricaoLonga)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DataInicio)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.DataInicio)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.DataFim)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.DataFim)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Gratuito)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Gratuito)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Valor)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Valor)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Online)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Online)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.NomeEmpresa)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.NomeEmpresa)
+            </dd>
+        </dl>
+    </div>
+    <div class="col-md-6">
+        @{ 
+            if (Model.Online)
+            {
+                @Html.DisplayName("Evento online")
+            }
+            else
+            {
+                <iframe width="600" height="450" frameborder="0" style="border:0" src=""></iframe>
+            }
+        }
+    </div>
+</div>
+<div>
+    <a href="javascript:history.go(-1)" class="btn btn-link">Voltar</a>
+</div>

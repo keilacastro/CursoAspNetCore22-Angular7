@@ -1,0 +1,10 @@
+﻿@if (ViewData.ModelState.ErrorCount > 0)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Oops! Alguma coisa não de certo:</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <div asp-validation-summary="All" class="text-danger"></div>
+    </div>
+}

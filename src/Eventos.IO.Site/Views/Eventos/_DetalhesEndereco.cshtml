@@ -1,0 +1,76 @@
+﻿@model Eventos.IO.Application.ViewModels.EventoViewModel
+
+<div class="card">
+    <div class="card-header">
+        <strong>Endereço do Evento</strong>
+    </div>
+    @if (Model.Endereco != null)
+    {
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Endereco.Logradouro)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Endereco.Numero)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Endereco.Complemento)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Endereco.Bairro)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Endereco.CEP)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Endereco.Cidade)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Endereco.Estado)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => model.Endereco.Logradouro)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.Endereco.Numero)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.Endereco.Complemento)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.Endereco.Bairro)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.Endereco.CEP)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.Endereco.Cidade)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => model.Endereco.Estado)
+                    </td>
+                    <td>
+                        <div>
+                            <a asp-action="AtualizarEndereco" asp-route-id="@Model.Id" data-modal="" class="btn btn-warning">
+                                <span title="Editar" class="fa fa-edit"></span> Editar
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <a asp-action="IncluirEndereco" asp-route-id="@Model.Id" data-modal="" class="btn btn-info">
+            <span title="Incluir Endereço" class=""></span> Adicionar Endereço
+        </a>
+    }
+</div>

@@ -1,0 +1,16 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">Ocorreu um erro, tente novamente ou entre em contato com o suporte técnico.</h2>
+
+@{
+    if(ViewData["MensagemErro"] != null)
+    {
+        <br />
+        <p class="text-danger">@ViewData["MensagemErro"]</p>
+    }
+}
+

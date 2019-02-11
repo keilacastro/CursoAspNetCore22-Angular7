@@ -1,0 +1,175 @@
+﻿@model Eventos.IO.Application.ViewModels.EventoViewModel
+
+@{
+    ViewData["Title"] = "Editar Evento";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h4></h4>
+<hr />
+
+<vc:summary />
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="Edit">
+            <vc:summary />
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group row">
+                <label asp-for="Nome" class="col-md-2 col-form-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="Nome" class="form-control" />
+                    <span asp-validation-for="Nome" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label asp-for="DescricaoCurta" class="col-md-2 col-form-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="DescricaoCurta" class="form-control" />
+                    <span asp-validation-for="DescricaoCurta" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label asp-for="DescricaoLonga" class="col-md-2 col-form-label"></label>
+                <div class="col-md-10">
+                    <textarea asp-for="DescricaoLonga" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="DescricaoLonga" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label asp-for="Categoria" class="col-md-2 col-form-label"></label>
+                <div class="col-md-4">
+                    @Html.Partial("_Categorias")
+                    <span asp-validation-for="Categoria" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label asp-for="DataInicio" class="col-md-2 col-form-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="DataInicio" type="text" asp-format="{0:dd/MM/yyyy}" class="form-control calendario" />
+                    <span asp-validation-for="DataInicio" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label asp-for="DataFim" class="col-md-2 col-form-label"></label>
+                <div class="col-md-4">
+                    <input asp-for="DataFim" type="text" asp-format="{0:dd/MM/yyyy}" class="form-control calendario" />
+                    <span asp-validation-for="DataFim" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-2"></div>
+                <div class="col-md-10">
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="Gratuito" />
+                        <label class="form-check-label">
+                            @Html.DisplayNameFor(model => model.Gratuito)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label asp-for="Valor" class="col-md-2 col-form-label"></label>
+                <div class="col-md-2">
+                    <input asp-for="Valor" class="form-control" />
+                    <span asp-validation-for="Valor" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-2"></div>
+                <div class="col-md-10">
+                    <div class="form-check">
+                        <input class="form-check-input" asp-for="Online" />
+                        <label class="form-check-label">
+                            @Html.DisplayNameFor(model => model.Online)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <label asp-for="NomeEmpresa" class="col-md-2 col-form-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="NomeEmpresa" class="form-control" />
+                    <span asp-validation-for="NomeEmpresa" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <input type="submit" id="btnAtualizar" value="Atualizar Evento" class="btn btn-success mr-2" />
+                <a asp-action="Index" class="btn btn-secondary">Voltar para Lista</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="form-group row" id="enderecoForm">
+    <div id="enderecoTarget">
+        <partial name="_DetalhesEndereco">
+    </div>
+</div>
+
+<div id="enderecoModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div id="enderecoModalContent"></div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/locales/bootstrap-datepicker.pt-BR.min.js"></script>
+    <script src="~/js/eventos.js"></script>
+    <script>
+        Init();
+        ValidacoesEvento();
+        AjaxModal();
+    </script>
+
+    @{
+        if (ViewBag.RetornoPost != null)
+        {
+            var notificao = ViewBag.RetornoPost.ToString().Split('|');
+
+            <script>
+                toastr["@notificao[0]"]("@notificao[1]");
+            </script>
+
+            if (notificao[0] == "success")
+            {
+                <script>
+                    @* TODO: Incluir funçoes em arquivo externo *@
+                    toastr.options.onHidden = function () {
+                        window.location = "@Url.Action("MeusEventos", "Eventos")";
+                    };
+                    toastr.options.onclick = function () {
+                        window.location = "@Url.Action("MeusEventos", "Eventos")";
+                    };
+                    toastr.options.onCloseClick = function () {
+                        window.location = "@Url.Action("MeusEventos", "Eventos")";
+                    };
+
+                    $("#btnAtualizar").prop("disbled", true);
+                </script>
+            }
+        }
+    }
+}
