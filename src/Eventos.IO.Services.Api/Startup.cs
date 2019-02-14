@@ -2,16 +2,12 @@
 using Eventos.IO.Infra.CrossCutting.AspNetFilters;
 using Eventos.IO.Infra.CrossCutting.Bus;
 using Eventos.IO.Infra.CrossCutting.Identity.Data;
-using Eventos.IO.Infra.CrossCutting.IoC;
 using Eventos.IO.Services.Api.Configurations;
 using Eventos.IO.Services.Api.Middleares;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -100,7 +96,7 @@ namespace Eventos.IO.Services.Api
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            
+
             app.UseCors(c =>
             {
                 c.AllowAnyHeader();
@@ -120,7 +116,7 @@ namespace Eventos.IO.Services.Api
             if (env.IsProduction())
             {
                 // bloqueia o acesso a usuários não logados
-                app.UseSwaggerAuthorized(); 
+                app.UseSwaggerAuthorized();
             }
 
             app.UseSwagger();
