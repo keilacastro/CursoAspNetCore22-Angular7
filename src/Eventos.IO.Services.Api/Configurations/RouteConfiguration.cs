@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 
 namespace Eventos.IO.Services.Api.Configurations
@@ -44,8 +46,21 @@ namespace Eventos.IO.Services.Api.Configurations
         }
     }
 
-    public static class MvcOptionsExtensions
+    public static class MvcRouteExtensions
     {
+
+        public static void AddApiVersioning(this IServiceCollection services, string routeUrl)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            services.Configure<MvcOptions>(options =>
+            {
+                options.UseCentralRoutePrefix(new RouteAttribute(routeUrl));
+            });
+        }
+
+
         public static void UseCentralRoutePrefix(this MvcOptions mvcOptions, IRouteTemplateProvider routeAttibute)
         {
             mvcOptions.Conventions.Insert(0, new RouteConvention(routeAttibute));

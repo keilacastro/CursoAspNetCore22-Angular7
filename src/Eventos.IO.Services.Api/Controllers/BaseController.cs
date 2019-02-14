@@ -16,7 +16,7 @@ namespace Eventos.IO.Services.Api.Controllers
         private readonly IUser _user;
 
         protected Guid OrganizadorId { get; set; }
-        
+
         protected BaseController(
             IDomainNotificationHandler<DomainNotification> notifications,
             IBus bus,
@@ -72,7 +72,8 @@ namespace Eventos.IO.Services.Api.Controllers
             var erros = ModelState.Values.SelectMany(v => v.Errors);
             foreach (var erro in erros)
             {
-                NotificarErro(string.Empty, erro.ErrorMessage);
+                var erroMsg = erro.Exception == null ? erro.ErrorMessage : erro.Exception.Message;
+                NotificarErro(string.Empty, erroMsg);
             }
         }
 

@@ -1,20 +1,15 @@
 ﻿using AutoMapper;
-using Eventos.IO.Domain.Interfaces;
 using Eventos.IO.Infra.CrossCutting.AspNetFilters;
 using Eventos.IO.Infra.CrossCutting.Bus;
 using Eventos.IO.Infra.CrossCutting.Identity.Data;
-using Eventos.IO.Infra.CrossCutting.Identity.Models;
-using Eventos.IO.Infra.CrossCutting.Identity.Security;
 using Eventos.IO.Infra.CrossCutting.IoC;
 using Eventos.IO.Services.Api.Configurations;
-using Eventos.IO.Services.Api.Extensions;
 using Eventos.IO.Services.Api.Middleares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -22,8 +17,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace Eventos.IO.Services.Api
 {
@@ -51,77 +44,53 @@ namespace Eventos.IO.Services.Api
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            // Ativando a utilização do ASP.NET Identity, a fim de
-            // permitir a recuperação de seus objetos via injeção de dependências
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            // Configurações de Autenticação, Autorização e JWT
+            services.AddMvcSecurity(Configuration);
 
-
-            var signinConfigurations = new SigningCredentialsConfigurations();
-            services.AddSingleton(signinConfigurations);
-
-            var tokenConfigurations = new JwtTokenConfigurations();
-            new ConfigureFromConfigurationOptions<JwtTokenConfigurations>(
-                    Configuration.GetSection(nameof(JwtTokenConfigurations)))
-                        .Configure(tokenConfigurations);
-            services.AddSingleton(tokenConfigurations);
-
-            // Aciona a extensão que irá configurar o uso de
-            // autenticação e autorização via tokens
-            services.AddJwtSecurity(signinConfigurations, tokenConfigurations);
-
+            // Options para configurações customizadas
             services.AddOptions();
+
+            // MVC com restrição de XML e adição de filtro de ações
             services.AddMvc(options =>
             {
                 options.OutputFormatters.Remove(new XmlDataContractSerializerOutputFormatter());
-                options.UseCentralRoutePrefix(new RouteAttribute("api/v{version}"));
-
-                // Policy de configuração do Token
-                var policy = new AuthorizationPolicyBuilder()
-                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                    .RequireAuthenticatedUser()
-                    .Build();
-
-                // Adiciona a policy no filtro de autenticação
-                options.Filters.Add(new AuthorizeFilter(policy));
                 options.Filters.Add(new ServiceFilterAttribute(typeof(GlobalActionLoggerFilter)));
+
+                //// Policy de configuração do Token
+                //var policy = new AuthorizationPolicyBuilder()
+                //    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                //    .RequireAuthenticatedUser()
+                //    .Build();
+
+                //// Adiciona a policy no filtro de autenticação
+                //options.Filters.Add(new AuthorizeFilter(policy));
             }).AddJsonOptions(options =>
             {
                 // remove valores nulos do retorno da API
                 options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddHttpContextAccessor();
+            // Versionamento do WebApi
+            services.AddApiVersioning("api/v{version}");
 
             // Aciona o automapper
             services.AddAutoMapper();
 
-            // Ativa o serviço de documentação do Swagger;
-            services.AddSwaggerGen(s =>
-            {
-                // Configura detalhes como a versão da API
-                s.SwaggerDoc("v1",
-                    new Info
-                    {
-                        Title = "Eventos.IO API",
-                        Version = "v1",
-                        Description = "Exemplo de API REST criada com o ASP.NET Core",
-                        TermsOfService = "",
-                        Contact = new Contact { Name = "Patrick Segantine", Email = "", Url = "http://projetox.io/licensa" },
-                        License = new License { Name = "MIT", Url = "http://projetox.io/licensa" }
-                    });
-            });
+            // Ativa o serviço de documentação do Swagger
+            services.AddSwaggerConfig();
+
+            services.AddHttpContextAccessor();
 
             // Registrar todos os DI
-            RegisterServices(services);
+            services.AddDIConfig();
         }
 
         public void Configure(IApplicationBuilder app,
                               IHostingEnvironment env,
                               IHttpContextAccessor accessor)
         {
+            #region Configurações MVC
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -131,8 +100,7 @@ namespace Eventos.IO.Services.Api
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            // aula 19 - 2h22min
+            
             app.UseCors(c =>
             {
                 c.AllowAnyHeader();
@@ -145,24 +113,26 @@ namespace Eventos.IO.Services.Api
             app.UseAuthentication();
             app.UseMvc();
 
-            // Habilita os middlewares que permitem a utilização do Swagger.
-            //app.UseSwaggerAuthorized(); // bloqueia o acesso a usuários não logados
+            #endregion
+
+            #region Swagger
+
+            if (env.IsProduction())
+            {
+                // bloqueia o acesso a usuários não logados
+                app.UseSwaggerAuthorized(); 
+            }
+
             app.UseSwagger();
             app.UseSwaggerUI(s =>
             {
                 s.SwaggerEndpoint("/swagger/v1/swagger.json", "Eventos.IO API v1.0");
             });
 
+            #endregion
+
             InMemoryBus.ContainerAccessor = () => accessor.HttpContext.RequestServices;
         }
 
-        #region Helpers
-
-        private static void RegisterServices(IServiceCollection services)
-        {
-            NativeInjectorBootStrapper.RegisterServices(services);
-        }
-
-        #endregion
     }
 }

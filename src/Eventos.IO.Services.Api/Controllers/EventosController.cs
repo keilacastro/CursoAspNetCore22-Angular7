@@ -66,6 +66,12 @@ namespace Eventos.IO.Services.Api.Controllers
         [Authorize(Policy = "PodeGravar")]
         public IActionResult Post([FromBody]RegistrarEventoCommand eventoCommand)
         {
+            if (!ModelState.IsValid)
+            {
+                NotificarErroModelStateInvalido();
+                return Response();
+            }
+
             // Registra o evento
             _bus.SendCommand(eventoCommand);
             return Response(eventoCommand);
